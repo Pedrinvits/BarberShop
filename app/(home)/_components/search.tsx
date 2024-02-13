@@ -8,7 +8,9 @@ import { zodResolver } from "@hookform/resolvers/zod"
 
 import { z } from "zod"
 import { useRouter } from "next/navigation";
- 
+ interface SearchProps {
+    defaultValues ?: z.infer<typeof formSchema>
+ }
 const formSchema = z.object({
   search : z
   .string({
@@ -17,12 +19,13 @@ const formSchema = z.object({
   .trim()
   .min(1,"Campo Obrigatório")
 })
-const Search = () => {
+const Search = ({defaultValues}:SearchProps) => {
 
     const router = useRouter()
 
     const form = useForm<z.infer<typeof formSchema>>({
-        resolver : zodResolver(formSchema)
+        resolver : zodResolver(formSchema),
+        defaultValues,
     })
 
     const handleSubmit = (data: z.infer<typeof formSchema>) => {
