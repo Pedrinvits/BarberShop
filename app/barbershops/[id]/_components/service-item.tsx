@@ -9,7 +9,10 @@ import { ptBR } from "date-fns/locale/pt-BR";
 import Image from "next/image";
 import { useMemo, useState } from "react";
 import { generateDayTimeList } from "../_helpers/hours";
-import { format } from "date-fns";
+import { addDays, format, setHours, setMinutes } from "date-fns";
+import { useSession } from "next-auth/react";
+import { saveBooking } from "../_actions/save-booking";
+import { Loader2 } from "lucide-react";
 
 interface ServiceItemProps {
     service : Service;
@@ -18,8 +21,12 @@ interface ServiceItemProps {
 }
 const ServiceItem = ({service,isBookingDisable,barbershop} : ServiceItemProps) => {
 
-    const [date, setDate] = useState<Date | undefined>(undefined)
+    const [isSubmitLoading, setSubmitLoading] = useState(false)
 
+    const {data} = useSession()
+
+    const [date, setDate] = useState<Date | undefined>(undefined)
+    
     const timeList = useMemo(() => {
         return date ? generateDayTimeList(date) : []
     },[date])
@@ -34,6 +41,34 @@ const ServiceItem = ({service,isBookingDisable,barbershop} : ServiceItemProps) =
     const handleDateClick = (date : Date | undefined) => {
             setDate(date)
             setHour(undefined)
+    }
+    const handleBookingSubmit = async () => {
+
+        setSubmitLoading(true)
+
+        try {
+            if (!hour || !date || !data?.user) {
+                return
+            }
+            // juntando data e hora para salvar no banco
+            const dateHour = Number(hour.split(":")[0]);
+            const dateMinutes = Number(hour.split(":")[1]);
+
+            const newDate = setMinutes(setHours(date, dateHour), dateMinutes);
+      
+            
+            await saveBooking({
+                serviceId: service.id,
+                barberShopID: barbershop.id,
+                date: newDate,
+                userId: (data.user as any).id,
+            })
+        }
+        catch (error){
+            console.log(error);
+        }finally{
+            setSubmitLoading(false)
+        }
     }
     return ( 
             <Card>
@@ -159,7 +194,12 @@ const ServiceItem = ({service,isBookingDisable,barbershop} : ServiceItemProps) =
                                                 </Card>
                                             </div>
                                             <SheetFooter className="px-5">
-                                                <Button disabled={!hour || !date}>Confirmar Reserva</Button>
+                                                <Button disabled={!hour || !date || isSubmitLoading} onClick={handleBookingSubmit}>
+                                                    {isSubmitLoading && (
+                                                        <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                                                    )}
+                                                    Confirmar Reserva
+                                                </Button>
                                             </SheetFooter>
                                         </SheetContent>
                                     </Sheet>
