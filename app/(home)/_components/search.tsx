@@ -41,7 +41,7 @@ const Search = ({defaultValues}:SearchProps) => {
                         control={form.control}
                         name="search"
                         render={({ field }) => (
-                            <FormItem>
+                            <FormItem className="w-full">
                            
                             <FormControl>
                                 <Input placeholder="Busque uma barbearia" {...field}/>
