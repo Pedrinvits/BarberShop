@@ -4,10 +4,10 @@ import { Calendar } from "@/app/_components/ui/calendar";
 import { Card,CardContent } from "@/app/_components/ui/card";
 import { SheetContent, SheetHeader, SheetTitle, SheetTrigger, Sheet, SheetFooter } from "@/app/_components/ui/sheet";
 
-import { Barbershop, Service } from "@prisma/client";
+import { Barbershop, Booking, Service } from "@prisma/client";
 import { ptBR } from "date-fns/locale/pt-BR";
 import Image from "next/image";
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { generateDayTimeList } from "../_helpers/hours";
 import { addDays, format, setHours, setMinutes } from "date-fns";
 import { useSession } from "next-auth/react";
@@ -15,6 +15,7 @@ import { saveBooking } from "../_actions/save-booking";
 import { Loader2 } from "lucide-react";
 import { toast } from "sonner"
 import { useRouter } from "next/navigation";
+import { getDayBookings } from "../_actions/get-daybookigs";
 
 interface ServiceItemProps {
     service : Service;
@@ -22,7 +23,7 @@ interface ServiceItemProps {
     barbershop : Barbershop;
 }
 const ServiceItem = ({service,isBookingDisable,barbershop} : ServiceItemProps) => {
-
+    
     const router = useRouter()
 
     const [isSubmitLoading, setSubmitLoading] = useState(false)
@@ -31,9 +32,32 @@ const ServiceItem = ({service,isBookingDisable,barbershop} : ServiceItemProps) =
 
     const [date, setDate] = useState<Date | undefined>(undefined)
     
+    const [dayBookings, setDayBookings]  = useState<Booking[]>([])
+  
     const timeList = useMemo(() => {
-        return date ? generateDayTimeList(date) : []
-    },[date])
+        if (!date) {
+            return 
+        }
+        return generateDayTimeList(date).filter((time) => {
+            // se houver alguma reserva no daybookins com a hora e minutos igual ao time nao vai incluir / aparecer
+            const timeHour = Number(time.split(":")[0]);
+            const timeMinutes = Number(time.split(":")[1]);
+            // verificando se tem algum agendamento no dayBookings
+            // se ele achar que ja tem hora e minuto agendado nesse dia, ele fica true e nao entra na lista
+            const booking = dayBookings.find((booking) => {
+              const bookingHour = booking.date.getHours();
+              const bookingMinutes = booking.date.getMinutes();
+      
+              return bookingHour === timeHour && bookingMinutes === timeMinutes;
+            });
+      
+            if (!booking) {
+              // time incluso na lista
+              return true;
+            }
+            return false;
+          });
+    },[date,dayBookings])
 
     const [hour,setHour] = useState<string | undefined>()
 
@@ -48,6 +72,21 @@ const ServiceItem = ({service,isBookingDisable,barbershop} : ServiceItemProps) =
             setDate(date)
             setHour(undefined)
     }
+    useEffect(()=>{
+
+        if(!date){
+            return
+        }
+
+        const refreshAvailableHours = async () => {
+            const _dayBookings = await getDayBookings(date, barbershop.id);
+            setDayBookings(_dayBookings);
+          };
+        
+          refreshAvailableHours()
+    },[date, barbershop.id])
+    
+    
     const handleBookingSubmit = async () => {
 
         setSubmitLoading(true)
@@ -165,7 +204,7 @@ const ServiceItem = ({service,isBookingDisable,barbershop} : ServiceItemProps) =
                                             {date && (
                                                 <div className="py-6 px-5 border-t border-solid border-secondary flex overflow-x-auto [&::-webkit-scrollbar]:hidden gap-3">
                                                         {
-                                                            timeList.map((time)=>(
+                                                            timeList?.map((time)=>(
                                                                 <Button 
                                                                 key={time} 
                                                                 variant={
