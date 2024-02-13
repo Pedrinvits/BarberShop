@@ -174,7 +174,7 @@ const ServiceItem = ({service,isBookingDisable,barbershop} : ServiceItemProps) =
                                                     onSelect={handleDateClick}
                                                     locale={ptBR}
                                                     // nao deixa escolher data menor que atual
-                                                    fromDate={new Date()}
+                                                    fromDate={addDays(new Date(),1)}
                                                    
                                                     styles={{
                                                         head_cell : {
