@@ -3,9 +3,10 @@ import { Card,CardContent } from "@/app/_components/ui/card";
 import { Service } from "@prisma/client";
 import Image from "next/image";
 interface ServiceItemProps {
-    service : Service
+    service : Service;
+    isBookingDisable?: boolean;
 }
-const ServiceItem = ({service} : ServiceItemProps) => {
+const ServiceItem = ({service,isBookingDisable} : ServiceItemProps) => {
     return ( 
             <Card>
                 <CardContent className="p-3 w-full">
@@ -35,7 +36,12 @@ const ServiceItem = ({service} : ServiceItemProps) => {
                                         }).format(Number(service.price))
                                     }
                                 </p>
-                                    <Button variant={"secondary"}>Reservar</Button>
+                                   {isBookingDisable ? (
+                                        <Button variant={"secondary"}>Reservar</Button>
+                                    ):(
+                                        <Button variant={"secondary"} disabled>Reservar</Button>
+                                    )
+                                   }
                                 </div>
                             </div>
                         </div>
