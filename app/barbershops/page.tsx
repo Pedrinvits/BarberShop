@@ -5,10 +5,12 @@ import Header from "../_components/header";
 import { db } from "../_lib/prisma";
 import Search from "../(home)/_components/search";
 import { Frown } from "lucide-react";
+import { format, formatDate } from "date-fns";
 
 interface BarbershopsPageProps {
   searchParams: {
     search?: string;
+    date?: number;
   };
 }
 
@@ -17,15 +19,28 @@ const BarbershopsPage = async ({ searchParams }: BarbershopsPageProps) => {
     return redirect("/");
   }
 
-  const barbershops = await db.barbershop.findMany({
-    where: {
-      name: {
-        contains: searchParams.search,
-        // nao considera maiuscula nem minuscula
-        mode: "insensitive",
-      },
-    },
-  });
+  // const barbershops = await db.barbershop.findMany({
+  //   where: {
+  //     name: {
+  //       contains: searchParams.search,
+  //       // nao considera maiuscula nem minuscula
+  //       mode: "insensitive",
+  //     },
+  //   },
+  // });
+  const params = {
+    date : { not : format(searchParams.date as any, "yyyy-MM-dd\'T\'HH:mm:ss")+".000Z"} ,
+    barbershop : {
+      name : searchParams.search,
+    }
+  }
+
+const barbershops = await db.booking.findMany({
+  include : {
+    barbershop : true,
+  },
+  where : params,
+})
 
   return (
     <>
