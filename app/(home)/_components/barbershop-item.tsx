@@ -3,13 +3,17 @@
 import { Badge } from "@/app/_components/ui/badge";
 import { Button } from "@/app/_components/ui/button";
 import { Card, CardContent } from "@/app/_components/ui/card";
-import { Barbershop } from "@prisma/client";
+import { Barbershop, Prisma, Booking } from "@prisma/client";
 import { StarIcon } from "lucide-react";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
 
 interface BarbershopItemProps {
-  barbershop: Barbershop;
+  barbershop: Prisma.BookingGetPayload<{
+    include : {
+      barbershop : true,
+    }
+  }> ;
 }
 
 const BarbershopItem = ({ barbershop }: BarbershopItemProps) => {
@@ -30,8 +34,8 @@ const BarbershopItem = ({ barbershop }: BarbershopItemProps) => {
             </Badge>
           </div>
           <Image
-            alt={barbershop.name}
-            src={barbershop.imageUrl}
+            alt={barbershop.barbershop.name}
+            src={barbershop.barbershop.imageUrl}
             style={{
               objectFit: "cover",
             }}
@@ -41,8 +45,8 @@ const BarbershopItem = ({ barbershop }: BarbershopItemProps) => {
         </div>
 
         <div className="px-2 pb-3">
-          <h2 className="font-bold mt-2 overflow-hidden text-ellipsis text-nowrap">{barbershop.name}</h2>
-          <p className="text-sm text-gray-400 overflow-hidden text-ellipsis text-nowrap">{barbershop.address}</p>
+          <h2 className="font-bold mt-2 overflow-hidden text-ellipsis text-nowrap">{barbershop.barbershop.name}</h2>
+          <p className="text-sm text-gray-400 overflow-hidden text-ellipsis text-nowrap">{barbershop.barbershop.address}</p>
           <Button className="w-full mt-3" variant="secondary" onClick={handleBookingClick}>
             Reservar
           </Button>
