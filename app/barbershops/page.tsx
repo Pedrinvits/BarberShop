@@ -30,16 +30,14 @@ const BarbershopsPage = async ({ searchParams }: BarbershopsPageProps) => {
   // });
   const params = {
     date : { not : format(searchParams.date as any, "yyyy-MM-dd\'T\'HH:mm:ss")+".000Z"} ,
-    barbershop : {
-      name : searchParams.search,
-    }
+    name : searchParams.search,
   }
 
-const barbershops = await db.booking.findMany({
+const barbershops = await db.barbershop.findMany({
   include : {
-    barbershop : true,
+    bookings : true,
   },
-  where : params,
+  where : params
 })
 
   return (
