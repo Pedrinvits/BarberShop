@@ -10,7 +10,7 @@ import { format, formatDate } from "date-fns";
 interface BarbershopsPageProps {
   searchParams: {
     search?: string;
-    date?: string;
+    date?: number;
   };
 }
 
