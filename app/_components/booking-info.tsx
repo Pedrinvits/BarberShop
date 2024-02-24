@@ -2,18 +2,23 @@ import { Barbershop, Booking, Prisma, Service } from "@prisma/client";
 import { format } from "date-fns";
 import { ptBR } from "date-fns/locale";
 import { Card, CardContent } from "./ui/card";
+import { Badge } from "./ui/badge";
 
 interface BookingInfoProps {
   booking: Partial<Pick<Booking, "date">> & {
     service: Pick<Service, "name" | "price">;
     barbershop: Pick<Barbershop, "name">;
   };
+  isConfirmed : any,
 }
 
-const BookingInfo = ({ booking }: BookingInfoProps) => {
+const BookingInfo = ({ booking, isConfirmed}: BookingInfoProps) => {
   return (
     <Card>
       <CardContent className="p-3 gap-3 flex flex-col">
+          <Badge variant={isConfirmed ? "default" : "secondary"} className="w-fit my-3">
+            {isConfirmed ? "Confirmado" : "Finalizado"}
+          </Badge>
         <div className="flex justify-between">
           <h2 className="font-bold">{booking.service.name}</h2>
           <h3 className="font-bold text-sm">

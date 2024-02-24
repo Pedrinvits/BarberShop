@@ -113,11 +113,11 @@ const BookingItem = ({booking} : BookingItemProps) => {
               </div>
             </div>
   
-            <Badge variant={isBookingConfirmed ? "default" : "secondary"} className="w-fit my-3">
+            {/* <Badge variant={isBookingConfirmed ? "default" : "secondary"} className="w-fit my-3">
               {isBookingConfirmed ? "Confirmado" : "Finalizado"}
-            </Badge>
+            </Badge> */}
   
-            <BookingInfo booking={booking} />
+            <div className="mt-4"><BookingInfo booking={booking} isConfirmed={isBookingConfirmed}/></div>
   
             <SheetFooter className="flex-row gap-3 mt-6">
               <SheetClose asChild>
