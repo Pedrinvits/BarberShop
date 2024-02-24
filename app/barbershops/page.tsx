@@ -10,7 +10,7 @@ import { format, formatDate } from "date-fns";
 interface BarbershopsPageProps {
   searchParams: {
     search?: string;
-    date?: number;
+    date?: string;
   };
 }
 
@@ -28,16 +28,24 @@ const BarbershopsPage = async ({ searchParams }: BarbershopsPageProps) => {
   //     },
   //   },
   // });
-  const params = {
-    date : { not : format(searchParams.date as any, "yyyy-MM-dd\'T\'HH:mm:ss")+".000Z"} ,
-    name : searchParams.search,
-  }
+
 
 const barbershops = await db.barbershop.findMany({
+  where : {
+    name: {
+          contains: searchParams.search,
+          // nao considera maiuscula nem minuscula
+          mode: "insensitive",
+      },
+      bookings : {
+        none : {
+          date : format(searchParams.date as any, "yyyy-MM-dd\'T\'HH:mm:ss")+".000Z"
+        }
+      }
+  },
   include : {
     bookings : true,
-  },
-  where : params
+  }
 })
 
   return (
