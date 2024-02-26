@@ -48,7 +48,7 @@ const BookingsPage = async () => {
 
         {confirmedBookings.length > 0 && (
           <>
-            <h2 className="text-gray-400 uppercase font-bold text-sm mb-3">Confirmados</h2>
+            <h2 className="text-gray-400 font-bold text-sm mb-3">Confirmados</h2>
 
             <div className="lg:grid lg:grid-cols-2 gap-4 flex flex-col">
               {confirmedBookings.map((booking) => (
@@ -60,7 +60,7 @@ const BookingsPage = async () => {
 
         {finishedBookings.length > 0 && (
           <>
-            <h2 className="text-gray-400 uppercase font-bold text-sm mt-6 mb-3">Finalizados</h2>
+            <h2 className="text-gray-400 font-bold text-sm mt-6 mb-3">Finalizados</h2>
 
             <div className="lg:grid lg:grid-cols-2 gap-4 flex flex-col">
               {finishedBookings.map((booking) => (
